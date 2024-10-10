@@ -5,15 +5,19 @@ import { useNavigate } from 'react-router-dom';
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://103.175.216.126:8000/api/auth/login', { username, password });
-      localStorage.setItem('token', response.data.token);
-      navigate('/homepage'); 
+      console.log(response.data.access);
+      localStorage.setItem('access', response.data.access);
+      navigate('/'); 
     } catch (error) {
+        setError(error);
+        console.log(error.response.data.detail ,'<----error');
       console.error('Login failed:', error);
     }
   };
@@ -30,6 +34,8 @@ const LoginPage = () => {
           <label htmlFor="password" className="block text-gray-700">Password</label>
           <input type="password" onChange={(e) => setPassword(e.target.value)} placeholder="Password" required className="border p-2 w-full" />
         </div>
+        { error && <p className="text-red-500">{error.response.data.detail}</p>}
+        
         <button type="submit" className="bg-blue-500 text-white p-2 w-full rounded-md">Login</button>
       </form>
     </div>
